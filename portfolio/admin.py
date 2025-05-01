@@ -7,7 +7,7 @@ class ProfileAdmin(admin.ModelAdmin):
 
 @admin.register(Experience)
 class ExperienceAdmin(admin.ModelAdmin):
-    list_display = ['position', 'company', 'start_date']
+    list_display = ['position', 'company', 'start_date_year']
 
 @admin.register(SkillCategory)
 class SkillCategoryAdmin(admin.ModelAdmin):
