@@ -23,7 +23,7 @@
             
                 <p>⚙️ <strong>Technical Skills:</strong><br>
                     {% for category in skills %}
-                        <strong>{{ category.name }}:</strong>
+                        <strong>{{ category.name }}:<br></strong>
                         {% for skill in category.skill_set.all %}
                             {{ skill.name }}{% if not forloop.last %}, {% endif %}
                         {% endfor %}<br><br>
