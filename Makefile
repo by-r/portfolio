@@ -21,17 +21,18 @@ local:
 migrate:
 	@echo "Making migrations..."
 	python $(DJANGO_MANAGE) makemigrations --settings=$(DEV_SETTINGS) --traceback
+	@echo "Running migrate..."
+	python $(DJANGO_MANAGE) migrate --settings=$(DEV_SETTINGS) --traceback
 
 # Reset DB using reset_db command
-.PHONY: resetdb
-resetdb:
+.PHONY: resetdb 
+resetdb: 
 	@echo "Removing the database..."
 	rm -rf db.sqlite3
 	rm -rf */migrations/*
-	@echo "Running make migrations..."
-	python $(DJANGO_MANAGE) makemigrations --settings=$(DEV_SETTINGS) --traceback
-	@echo "Running migrate..."
-	python $(DJANGO_MANAGE) migrate --settings=$(DEV_SETTINGS) --traceback
+
+.PHONY: clean
+clean: migrate resetdb
 
 # Run tests (optional if you're using pytest)
 .PHONY: test
