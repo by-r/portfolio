@@ -21,6 +21,7 @@ class Experience(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     position = models.CharField(max_length=100)
     company = models.CharField(max_length=100)
+    company_url = models.URLField(blank=True, null=True)
     start_date = models.CharField(max_length=20)  # Format: "9/2023"
     start_date_month = models.CharField(max_length=20)  # Format: "9/2023"
     start_date_year = models.CharField(max_length=20)  # Format: "9/2023"
