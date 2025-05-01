@@ -39,7 +39,12 @@
                     <li>
                         <a class="fw-semibold text-decoration-none text-muted">{{ exp.position }}</a> | 
                         <a class="text-decoration-none" href="#">{{ exp.company }}</a> | 
-                        {{ exp.start_date }} - {{ exp.end_date }}
+                        {{ exp.start_date_month }}/{{ exp.end_date_year }} - 
+                        {% if exp.end_date_month %} 
+                            {{exp.end_date_month}}/{{exp.end_date_year}}
+                        {% else %}
+                            Current
+                        {% endif %}
                         <ul class="mt-2">
                             {% for line in exp.description.splitlines %}
                             <li class="fw-light">{{ line }}</li>
