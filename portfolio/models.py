@@ -12,6 +12,7 @@ class Profile(models.Model):
         return self.name
     
     def save(self, *args, **kwargs):
+        self.title = self.title.upper()
         if not self.pk and Profile.objects.exists():
             raise ValidationError("Only one profile can be created")
         super().save(*args, **kwargs)
