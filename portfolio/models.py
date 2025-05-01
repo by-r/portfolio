@@ -29,9 +29,15 @@ class SkillCategory(models.Model):
     name = models.CharField(max_length=50)
     order = models.PositiveIntegerField(default=0)  # For sorting
 
+    def __str__(self):
+        return self.name
+
     class Meta:
         ordering = ['order']
 
 class Skill(models.Model):
     category = models.ForeignKey(SkillCategory, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
+    
+    def __str__(self):
+        return self.name
