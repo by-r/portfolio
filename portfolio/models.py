@@ -8,6 +8,9 @@ class Profile(models.Model):
     email = models.EmailField()
     linkedin_url = models.URLField()
     
+    def __str__(self):
+        return self.name
+    
     def save(self, *args, **kwargs):
         if not self.pk and Profile.objects.exists():
             raise ValidationError("Only one profile can be created")
