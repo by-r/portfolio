@@ -24,8 +24,8 @@ class Experience(models.Model):
     start_date_month = models.CharField(max_length=20)  # Format: "9/2023"
     start_date_year = models.CharField(max_length=20)  # Format: "9/2023"
     end_date = models.CharField(max_length=20)    # Format: "Current" or "12/2022"
-    end_date_month = models.CharField(max_length=20)    # Format: "Current" or "12/2022"
-    end_date_year = models.CharField(max_length=20)    # Format: "Current" or "12/2022"
+    end_date_month = models.CharField(max_length=20, null=True)    # Format: "Current" or "12/2022"
+    end_date_year = models.CharField(max_length=20, null=True)    # Format: "Current" or "12/2022"
     description = models.TextField()  # Use newlines for bullet points
 
 class SkillCategory(models.Model):
