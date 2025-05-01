@@ -34,6 +34,8 @@ class SkillCategory(models.Model):
 
     class Meta:
         ordering = ['order']
+        verbose_name = 'Skill Category'
+        verbose_name_plural = 'Skill Categories'
 
 class Skill(models.Model):
     category = models.ForeignKey(SkillCategory, on_delete=models.CASCADE)
