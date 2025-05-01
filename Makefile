@@ -45,5 +45,6 @@ help:
 	@echo "Usage:"
 	@echo "  make lint            # Run Black to lint your code"
 	@echo "  make local       # Run Django development server"
-	@echo "  make resetdb       # Reset the database"
+	@echo "  make migrate       # Make migrations"
+	@echo "  make clean       # Reset the database"
 	@echo "  make test            # (WIP)Run Django tests"
