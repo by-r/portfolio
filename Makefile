@@ -2,52 +2,47 @@
 
 # Django manage command
 DJANGO_MANAGE = manage.py
+DEV_SETTINGS := base.settings.local
+VENV_DIR := venv
 
 # Linting command (using black)
 .PHONY: lint
 lint:
 	black .
 
-# Run Django development server
-.PHONY: runserver
-runserver:
-	python $(DJANGO_MANAGE) runserver
+# Run dev server
+.PHONY: local
+local:
+	@echo "Starting dev server..."
+	python $(DJANGO_MANAGE) runserver --settings=$(DEV_SETTINGS)
 
-# Clean the SQLite database (use with caution)
-.PHONY: clean-sqlite
-clean-sqlite:
-	@echo "WARNING: This will delete the SQLite database!"
-	rm -f db.sqlite3
-	python $(DJANGO_MANAGE) migrate --fake
+# Make migrations
+.PHONY: migrate
+migrate:
+	@echo "Making migrations..."
+	python $(DJANGO_MANAGE) makemigrations --settings=$(DEV_SETTINGS) --traceback
 
-# Clear pyc files (optional cleanup)
-.PHONY: clear-pyc
-clear-pyc:
-	find . -name "*.pyc" -exec rm -f {} \;
-
-# Install requirements (if needed)
-.PHONY: install-requirements
-install-requirements:
-	pip install -r requirements.txt
+# Reset DB using reset_db command
+.PHONY: resetdb
+resetdb:
+	@echo "Removing the database..."
+	rm -rf db.sqlite3
+	rm -rf */migrations/*
+	@echo "Running make migrations..."
+	python $(DJANGO_MANAGE) makemigrations --settings=$(DEV_SETTINGS) --traceback
+	@echo "Running migrate..."
+	python $(DJANGO_MANAGE) migrate --settings=$(DEV_SETTINGS) --traceback
 
 # Run tests (optional if you're using pytest)
 .PHONY: test
 test:
 	python $(DJANGO_MANAGE) test
 
-# Collect static files (optional)
-.PHONY: collectstatic
-collectstatic:
-	python $(DJANGO_MANAGE) collectstatic --noinput
-
 # Default target: help message
 .PHONY: help
 help:
 	@echo "Usage:"
 	@echo "  make lint            # Run Black to lint your code"
-	@echo "  make runserver       # Run Django development server"
-	@echo "  make clean-sqlite    # Clean the SQLite database (deletes db.sqlite3)"
-	@echo "  make clear-pyc       # Clear all .pyc files"
-	@echo "  make install-requirements  # Install requirements from requirements.txt"
-	@echo "  make test            # Run Django tests"
-	@echo "  make collectstatic   # Collect static files"
+	@echo "  make local       # Run Django development server"
+	@echo "  make resetdb       # Reset the database"
+	@echo "  make test            # (WIP)Run Django tests"
