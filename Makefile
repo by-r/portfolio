@@ -3,6 +3,7 @@
 # Django manage command
 DJANGO_MANAGE = manage.py
 DEV_SETTINGS := base.settings.local
+PROD_SETTINGS := base.settings.production
 VENV_DIR := venv
 
 # Linting command (using black)
