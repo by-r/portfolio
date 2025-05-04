@@ -37,8 +37,8 @@ clean: migrate resetdb
 
 # Run tests (optional if you're using pytest)
 .PHONY: test
-test:
-	python $(DJANGO_MANAGE) test
+test: 
+	python $(DJANGO_MANAGE) portfolio.tests
 
 # Default target: help message
 .PHONY: help
