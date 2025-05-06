@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.views.generic import TemplateView
-from .models import Experience, Profile, SkillCategory
+from .models import Experience, Profile, SkillCategory, Project
 
 # Create your views here.
 
@@ -20,4 +20,5 @@ class ProfileView(TemplateView):
         context["profile"] = profile
         context["experiences"] = Experience.objects.filter(profile=profile)
         context["skills"] = SkillCategory.objects.all()
+        context["projects"] = Project.objects.all()
         return context
