@@ -57,3 +57,15 @@ class Skill(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Project(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField()
+    url = models.URLField(blank=True, null=True)
+    github_url = models.URLField(blank=True, null=True)
+    live_url = models.URLField(blank=True, null=True)
+    tags = models.ManyToManyField(Skill)
+
+    def __str__(self):
+        return self.name
