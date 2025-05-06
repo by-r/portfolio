@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse
-from portfolio.models import Profile, Experience, SkillCategory, Skill
+from portfolio.models import Profile, Experience, SkillCategory, Skill, Project
 
 
 class ProfileViewTests(TestCase):
@@ -65,3 +65,40 @@ class SkillViewTests(TestCase):
         self.assertTrue(
             content.index(self.category.name) < content.index(category2.name)
         )
+
+class ProjectViewTests(TestCase):
+    def setUp(self):
+        self.profile = Profile.objects.create(
+            name="John Doe",
+            title="Software Engineer",
+            email="john@example.com",
+            linkedin_url="https://linkedin.com/in/johndoe",
+        )
+        self.category = SkillCategory.objects.create(name="Programming", order=1)
+        self.skill = Skill.objects.create(category=self.category, name="Python")
+        self.project = Project.objects.create(
+            name="Test Project",
+            description="A test project",
+            github_url="https://github.com/test/project",
+            live_url="https://project.example.com"
+        )
+        self.project.tags.add(self.skill)
+
+    def test_project_display(self):
+        response = self.client.get(reverse("profile"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.project.name)
+        self.assertContains(response, self.project.description)
+        self.assertContains(response, self.project.github_url)
+        self.assertContains(response, self.project.live_url)
+        self.assertContains(response, self.skill.name)
+
+    def test_multiple_projects(self):
+        project2 = Project.objects.create(
+            name="Another Project",
+            description="Another test project"
+        )
+        response = self.client.get(reverse("profile"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.project.name)
+        self.assertContains(response, project2.name)
