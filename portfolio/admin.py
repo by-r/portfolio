@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Profile, Experience, SkillCategory, Skill
+
+from .models import Experience, Profile, Skill, SkillCategory
 
 
 @admin.register(Profile)

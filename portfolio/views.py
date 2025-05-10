@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import TemplateView
-from .models import Experience, Profile, SkillCategory, Project
+
+from .models import Experience, Profile, Project, SkillCategory
 
 # Create your views here.
 

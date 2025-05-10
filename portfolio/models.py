@@ -1,5 +1,5 @@
-from django.db import models
 from django.core.exceptions import ValidationError
+from django.db import models
 
 
 class Profile(models.Model):
@@ -26,12 +26,8 @@ class Experience(models.Model):
     company_url = models.URLField(blank=True, null=True)
     start_date_month = models.CharField(max_length=20)  # Format: "9/2023"
     start_date_year = models.CharField(max_length=20)  # Format: "9/2023"
-    end_date_month = models.CharField(
-        max_length=20, blank=True, null=True
-    )  # Format: "Current" or "12/2022"
-    end_date_year = models.CharField(
-        max_length=20, blank=True, null=True
-    )  # Format: "Current" or "12/2022"
+    end_date_month = models.CharField(max_length=20, blank=True, null=True)  # Format: "Current" or "12/2022"
+    end_date_year = models.CharField(max_length=20, blank=True, null=True)  # Format: "Current" or "12/2022"
     description = models.TextField()  # Use newlines for bullet points
 
     def __str__(self):

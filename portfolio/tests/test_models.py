@@ -1,9 +1,11 @@
-from django.test import TestCase
 from django.core.exceptions import ValidationError
-from portfolio.models import Profile, Experience, SkillCategory, Skill, Project
+from django.test import TestCase
+
+from portfolio.models import Experience, Profile, Project, Skill, SkillCategory
 
 
 class ProfileModelTests(TestCase):
+
     def setUp(self):
         self.profile_data = {
             "name": "John Doe",
@@ -25,6 +27,7 @@ class ProfileModelTests(TestCase):
 
 
 class ExperienceModelTests(TestCase):
+
     def setUp(self):
         self.profile = Profile.objects.create(
             name="John Doe",
@@ -53,6 +56,7 @@ class ExperienceModelTests(TestCase):
 
 
 class SkillCategoryModelTests(TestCase):
+
     def test_category_creation(self):
         category = SkillCategory.objects.create(name="Programming", order=1)
         self.assertEqual(str(category), "Programming")
@@ -66,6 +70,7 @@ class SkillCategoryModelTests(TestCase):
 
 
 class SkillModelTests(TestCase):
+
     def setUp(self):
         self.category = SkillCategory.objects.create(name="Programming", order=1)
 
@@ -76,6 +81,7 @@ class SkillModelTests(TestCase):
 
 
 class ProjectModelTests(TestCase):
+
     def setUp(self):
         self.category = SkillCategory.objects.create(name="Programming", order=1)
         self.skill1 = Skill.objects.create(category=self.category, name="Python")
@@ -104,9 +110,7 @@ class ProjectModelTests(TestCase):
         self.assertEqual(str(project), "Portfolio Website")
 
     def test_optional_fields(self):
-        minimal_project = Project.objects.create(
-            name="Minimal Project", description="A project with minimal fields"
-        )
+        minimal_project = Project.objects.create(name="Minimal Project", description="A project with minimal fields")
         self.assertIsNone(minimal_project.url)
         self.assertIsNone(minimal_project.github_url)
         self.assertIsNone(minimal_project.live_url)
