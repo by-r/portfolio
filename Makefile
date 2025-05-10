@@ -5,6 +5,7 @@ DJANGO_MANAGE = manage.py
 DEV_SETTINGS := base.settings.local
 PROD_SETTINGS := base.settings.production
 VENV_DIR := venv
+RUN = uv run
 
 # Linting command (using black)
 .PHONY: lint
@@ -15,15 +16,15 @@ lint:
 .PHONY: local
 local:
 	@echo "Starting dev server..."
-	python $(DJANGO_MANAGE) runserver --settings=$(DEV_SETTINGS)
+	$(RUN) $(DJANGO_MANAGE) runserver --settings=$(DEV_SETTINGS)
 
 # Make migrations
 .PHONY: migrate
 migrate:
 	@echo "Making migrations..."
-	python $(DJANGO_MANAGE) makemigrations --settings=$(DEV_SETTINGS) --traceback
+	$(RUN) $(DJANGO_MANAGE) makemigrations --settings=$(DEV_SETTINGS) --traceback
 	@echo "Running migrate..."
-	python $(DJANGO_MANAGE) migrate --settings=$(DEV_SETTINGS) --traceback
+	$(RUN) $(DJANGO_MANAGE) migrate --settings=$(DEV_SETTINGS) --traceback
 
 # Reset DB using reset_db command
 .PHONY: resetdb 
@@ -38,7 +39,7 @@ clean: migrate resetdb
 # Run tests (optional if you're using pytest)
 .PHONY: test
 test: 
-	python $(DJANGO_MANAGE) test portfolio.tests
+	$(RUN) $(DJANGO_MANAGE) test portfolio.tests
 
 # Default target: help message
 .PHONY: help
