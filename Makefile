@@ -8,9 +8,16 @@ VENV_DIR := venv
 RUN = uv run
 
 # Linting command (using black)
+.PHONY: install-pre-commit
+install-pre-commit:
+	uv run pre-commit uninstall; uv run pre-commit install
+
 .PHONY: lint
 lint:
-	black .
+	uv run pre-commit run --all-files
+
+.PHONY: update
+update: install-pre-commit lint
 
 # Run dev server
 .PHONY: local
