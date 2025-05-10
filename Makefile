@@ -10,11 +10,11 @@ RUN = uv run
 # Linting command (using black)
 .PHONY: install-pre-commit
 install-pre-commit:
-	uv run pre-commit uninstall; uv run pre-commit install
+	$(RUN) pre-commit uninstall; $(RUN) pre-commit install
 
 .PHONY: lint
 lint:
-	uv run pre-commit run --all-files
+	$(RUN) pre-commit run --all-files
 
 .PHONY: update
 update: install-pre-commit lint
