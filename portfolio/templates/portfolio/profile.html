@@ -20,7 +20,7 @@
                 <p>👤 <strong>About:</strong><br>
                     {{ profile.about_text }}
                 </p>
-            
+
                 <p>⚙️ <strong>Technical Skills:</strong><br>
                     {% for category in skills %}
                         <strong>{{ category.name }}:<br></strong>
@@ -37,10 +37,10 @@
                 <ul class="list-unstyled">
                     {% for exp in experiences %}
                     <li>
-                        <a class="fw-semibold text-decoration-none text-muted">{{ exp.position }}</a> | 
-                        <a class="text-decoration-none {% if exp.company_url %}{% else %}text-muted{% endif %}" {% if exp.company_url %}target="_blank" href="{{exp.company_url}}"{% endif %}>{{ exp.company }}</a> | 
-                        {{ exp.start_date_month }}/{{ exp.start_date_year }} - 
-                        {% if exp.end_date_month %} 
+                        <a class="fw-semibold text-decoration-none text-muted">{{ exp.position }}</a> |
+                        <a class="text-decoration-none {% if exp.company_url %}{% else %}text-muted{% endif %}" {% if exp.company_url %}target="_blank" href="{{exp.company_url}}"{% endif %}>{{ exp.company }}</a> |
+                        {{ exp.start_date_month }}/{{ exp.start_date_year }} -
+                        {% if exp.end_date_month %}
                             {{exp.end_date_month}}/{{exp.end_date_year}}
                         {% else %}
                             Current

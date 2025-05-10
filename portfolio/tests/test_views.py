@@ -66,6 +66,7 @@ class SkillViewTests(TestCase):
             content.index(self.category.name) < content.index(category2.name)
         )
 
+
 class ProjectViewTests(TestCase):
     def setUp(self):
         self.profile = Profile.objects.create(
@@ -80,7 +81,7 @@ class ProjectViewTests(TestCase):
             name="Test Project",
             description="A test project",
             github_url="https://github.com/test/project",
-            live_url="https://project.example.com"
+            live_url="https://project.example.com",
         )
         self.project.tags.add(self.skill)
 
@@ -95,8 +96,7 @@ class ProjectViewTests(TestCase):
 
     def test_multiple_projects(self):
         project2 = Project.objects.create(
-            name="Another Project",
-            description="Another test project"
+            name="Another Project", description="Another test project"
         )
         response = self.client.get(reverse("profile"))
         self.assertEqual(response.status_code, 200)

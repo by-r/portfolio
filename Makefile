@@ -27,8 +27,8 @@ migrate:
 	$(RUN) $(DJANGO_MANAGE) migrate --settings=$(DEV_SETTINGS) --traceback
 
 # Reset DB using reset_db command
-.PHONY: resetdb 
-resetdb: 
+.PHONY: resetdb
+resetdb:
 	@echo "Removing the database..."
 	rm -rf db.sqlite3
 	rm -rf */migrations/*
@@ -38,7 +38,7 @@ clean: migrate resetdb
 
 # Run tests (optional if you're using pytest)
 .PHONY: test
-test: 
+test:
 	$(RUN) $(DJANGO_MANAGE) test portfolio.tests
 
 # Default target: help message

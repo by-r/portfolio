@@ -84,13 +84,13 @@ class ProjectModelTests(TestCase):
             "name": "Portfolio Website",
             "description": "A personal portfolio website",
             "github_url": "https://github.com/user/portfolio",
-            "live_url": "https://portfolio.example.com"
+            "live_url": "https://portfolio.example.com",
         }
 
     def test_project_creation(self):
         project = Project.objects.create(**self.project_data)
         project.tags.add(self.skill1, self.skill2)
-        
+
         self.assertEqual(project.name, "Portfolio Website")
         self.assertEqual(project.description, "A personal portfolio website")
         self.assertEqual(project.github_url, "https://github.com/user/portfolio")
@@ -105,8 +105,7 @@ class ProjectModelTests(TestCase):
 
     def test_optional_fields(self):
         minimal_project = Project.objects.create(
-            name="Minimal Project",
-            description="A project with minimal fields"
+            name="Minimal Project", description="A project with minimal fields"
         )
         self.assertIsNone(minimal_project.url)
         self.assertIsNone(minimal_project.github_url)

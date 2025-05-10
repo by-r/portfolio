@@ -14,5 +14,5 @@
 
 ## DEPLOY
 - Deploy to my OCI/Cloudflare ?
-- Dockerize 
+- Dockerize
 - CICD using Gitghub Actions
