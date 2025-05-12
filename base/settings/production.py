@@ -16,6 +16,19 @@ DEBUG = bool(os.environ.get("DEBUG", False)) == "True"
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
 
+INSTALLED_APPS += ["whitenoise.runserver_nostatic"]
+MIDDLEWARE += ["whitenoise.middleware.WhiteNoiseMiddleware"]
+
+# https://whitenoise.readthedocs.io/en/latest/django.html
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
 # Security Settings
 SECURE_SSL_REDIRECT = os.getenv("SECURE_SSL_REDIRECT", "True") == "True"
 SESSION_COOKIE_SECURE = os.getenv("SESSION_COOKIE_SECURE", "True") == "True"
