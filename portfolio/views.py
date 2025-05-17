@@ -6,10 +6,6 @@ from .models import Experience, Profile, Project, SkillCategory
 # Create your views here.
 
 
-class NameView(TemplateView):
-    template_name = "portfolio/landing.html"
-
-
 class ProfileView(TemplateView):
     template_name = "portfolio/profile.html"
 
