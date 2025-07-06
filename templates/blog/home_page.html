@@ -1,6 +1,10 @@
-{% load wagtailcore_tags %}
+{% extends "_base.html" %}
+{% load wagtailcore_tags navigation_tags %}
 
+
+{% block title %}template-title{% endblock %}
 {% block body_class %}template-homepage{% endblock %}
+
 {% block content %}
     {{ page.body|richtext }}
 {% endblock %}

@@ -1,5 +1,11 @@
-<nav class="nav mt-5 justify-content-center">
-		<a class="nav-link active" href="#" aria-current="page">Active</a>
-        <a class="nav-link" href="#">Link</a>
-        <a class="nav-link disabled" href="#">Disabled link</a>
+<nav class="navbar bg-body-tertiary">
+	<div class="container-fluid px-5 py-4 mx-5">
+		<div class="justify-content-start">
+			<a class="nav-item" href="#" aria-current="page">Active</a>
+			<a class="nav-item" href="#">Link</a>
+		</div>
+		<div class="justify-content-end">
+			{{ "Check out www.djangoproject.com" | urlize }}
+		</div>
+	</div>
 </nav>
