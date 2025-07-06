@@ -1,10 +1,10 @@
 {% extends "_base.html" %}
 {% load static %}
 
-{% block title %} …<title>{{ profile.name }} - Resume</title> {% endblock title %}
+{% block title %}{{ profile.name }} - Resume{% endblock title %}
 
 {% block content %}
-<div class="container mt-5 p-5 border border-3 border-start-0 border-top-0 shadow">
+
 		<div class="row">
 			<div class="col-md-4">
 				<h1 class='font-monospace'>{{ profile.name }}</h1>
@@ -90,5 +90,5 @@
             </div>
             {% endif %}
         </div>
-</div>
+
 {% endblock content %}
