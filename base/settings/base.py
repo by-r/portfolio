@@ -53,6 +53,9 @@ INSTALLED_APPS = [
     "modelcluster",
     "taggit",
     "blog"
+
+    # Third-party
+    "fontawesomefree",
 ]
 
 MIDDLEWARE = [
