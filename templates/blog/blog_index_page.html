@@ -1,0 +1,22 @@
+{% extends "_base.html" %}
+{% load wagtailcore_tags navigation_tags %}
+
+{% block title %}template-blogindexpage{% endblock %}
+{% block body_class %}template-blogindexpage{% endblock %}
+
+{% block content %}
+
+    <div class="intro">{{ page.intro|richtext }}</div>
+
+	<div class="row h6 container p-4">
+		{% for post in page.get_children %}
+			<div class="col-8">
+				<div><a href="{% pageurl post %}">{{ post.title }}</a></div>
+			</div>
+			<div class="col-4 ">
+				<small class="text-body-secondary">{{post.specific.date}}</small>
+			</div>
+		{% endfor %}
+	</div>
+
+{% endblock %}

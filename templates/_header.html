@@ -1,0 +1,10 @@
+{% load wagtailcore_tags navigation_tags %}
+
+{% get_site_root_url as site_root %}
+<div class="position-sticky top-0">
+<nav class="nav mt-5 justify-content-center top-bar">
+	<a class="nav-link" href="{% url "profile" %}">About</a>
+	<a class="nav-link active" href="{% pageurl site_root %}" aria-current="page">Writing</a>
+        <a class="nav-link disabled" href="#">Disabled link</a>
+</nav>
+</div>
