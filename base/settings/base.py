@@ -52,7 +52,7 @@ INSTALLED_APPS = [
     "wagtail",
     "modelcluster",
     "taggit",
-    "blog"
+    "blog",
 
     # Third-party
     "fontawesomefree",
