@@ -1,0 +1,8 @@
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+# RUF012: "mutable class attribute" — Django relies on this idiom for
+# ModelAdmin options, Meta.ordering, widget Media, and migration lists.
+ignore = ["RUF012"]

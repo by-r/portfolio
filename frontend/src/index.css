@@ -1,0 +1,59 @@
+/*
+ * Tailwind CSS v4 + Kumo UI (@cloudflare/kumo).
+ * Import order matters: Kumo theme tokens must be registered before Tailwind.
+ * @source tells Tailwind v4 to scan Kumo's compiled components.
+ */
+@source "../node_modules/@cloudflare/kumo/dist/**/*.{js,jsx,ts,tsx}";
+@import "@cloudflare/kumo/styles/tailwind";
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  @apply bg-zinc-50 text-zinc-900 antialiased;
+}
+
+/* Typography for rendered Markdown (blog post body) */
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3 {
+  @apply font-semibold tracking-tight text-zinc-900 mt-8 mb-3;
+}
+.markdown-body h1 {
+  @apply text-3xl;
+}
+.markdown-body h2 {
+  @apply text-2xl;
+}
+.markdown-body h3 {
+  @apply text-xl;
+}
+.markdown-body p {
+  @apply my-4 leading-7 text-zinc-700;
+}
+.markdown-body ul {
+  @apply my-4 list-disc pl-6 space-y-1 text-zinc-700;
+}
+.markdown-body ol {
+  @apply my-4 list-decimal pl-6 space-y-1 text-zinc-700;
+}
+.markdown-body a {
+  @apply text-blue-600 underline underline-offset-2;
+}
+.markdown-body blockquote {
+  @apply my-4 border-l-4 border-zinc-300 pl-4 italic text-zinc-600;
+}
+.markdown-body pre {
+  @apply my-4 overflow-x-auto rounded-lg bg-zinc-900 p-4 text-sm text-zinc-100;
+}
+.markdown-body code {
+  @apply rounded bg-zinc-200 px-1.5 py-0.5 text-sm text-zinc-800;
+}
+.markdown-body pre code {
+  @apply bg-transparent p-0 text-zinc-100;
+}
+.markdown-body hr {
+  @apply my-8 border-zinc-200;
+}
