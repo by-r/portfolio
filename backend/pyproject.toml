@@ -1,3 +1,24 @@
+[project]
+name = "portfolio-backend"
+version = "0.1.0"
+description = "Django + django-ninja backend for the portfolio site."
+requires-python = ">=3.10"
+dependencies = [
+    "Django==5.2.17",
+    "django-ninja==1.6.3",
+    "environs==15.1.0",
+    "django-cors-headers==4.9.0",
+    "django-csp==4.0",
+    "psycopg[binary]==3.3.4",
+]
+
+[dependency-groups]
+dev = [
+    "pytest==9.1.1",
+    "pytest-django==4.14.0",
+    "ruff==0.16.3",
+]
+
 [tool.ruff]
 line-length = 100
 target-version = "py310"

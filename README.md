@@ -16,23 +16,27 @@ frontend/  Vite React SPA — Node 18+
 ## Prerequisites
 
 - Python 3.10+
+- [uv](https://docs.astral.sh/uv/) (`pip install uv`) — Python package manager
 - Node 18+ (tested with 18.18)
 - (optional) PostgreSQL for production
+- (optional) GNU make — used by the root `Makefile` (see below); on Windows install via `choco install make` / `winget install` or just run the recipes directly
 
-## Backend setup
+## Backend setup (uv)
+
+Dependencies are declared in `backend/pyproject.toml` and locked in `backend/uv.lock`.
 
 ```bash
 cd backend
-python -m venv .venv
-# Windows: .venv\Scripts\activate   ·  macOS/Linux: source .venv/bin/activate
-pip install -r requirements-dev.txt
-cp .env.example .env               # then edit .env (SECRET_KEY etc.)
+uv sync                           # creates/refreshes .venv and installs everything
+cp .env.example .env              # then edit .env (SECRET_KEY, DEBUG, …)
 
-python manage.py migrate
-python manage.py seed_posts        # optional: 2 sample posts
-python manage.py createsuperuser  # for Django admin access
-python manage.py runserver        # http://127.0.0.1:8000
+uv run python manage.py migrate
+uv run python manage.py seed_posts        # optional: 2 sample posts
+uv run python manage.py createsuperuser  # for Django admin access
+uv run python manage.py runserver        # http://127.0.0.1:8000
 ```
+
+A local `backend/.env` (gitignored) with `DEBUG=True` is created during development so `manage.py` commands work out of the box.
 
 - API: `http://127.0.0.1:8000/api/` — `GET /api/health`, `GET /api/posts`, `GET /api/posts/{slug}`
 - Interactive docs (dev only): `http://127.0.0.1:8000/api/docs` (disabled when `DEBUG=False`)
@@ -47,6 +51,23 @@ npm run dev                       # http://localhost:5173
 ```
 
 The dev server proxies `/api` to `http://127.0.0.1:8000` (see `vite.config.ts`), so no CORS config is needed locally. For a production build: `npm run build` (typechecks + bundles to `dist/`).
+
+## Makefile
+
+The root `Makefile` wraps the common commands (backend via `uv`, frontend via `npm`). Run `make help` for the full list. Recipes assume a POSIX shell (git-bash / WSL / macOS / Linux).
+
+| Target | What it does |
+| --- | --- |
+| `make setup` | `uv sync` — install Python deps into `backend/.venv` |
+| `make migrate` / `make seed` / `make superuser` | Django migrate / seed sample posts / create admin user |
+| `make run` | Django dev server on `http://127.0.0.1:8000` |
+| `make test` | Backend test suite (`uv run pytest`) |
+| `make lint` / `make format` | `ruff check` / `ruff format` |
+| `make check` | CI gate: lint + format-check + tests |
+| `make deploy-check` | `manage.py check --deploy` (Django deployment checklist) |
+| `make collectstatic` | Collect static files for production |
+| `make frontend-install` / `frontend-dev` / `frontend-build` / `frontend-typecheck` | npm ci / dev server / build / typecheck |
+| `make clean` | Remove `frontend/dist` |
 
 ## Environment variables
 
@@ -86,14 +107,17 @@ See `backend/.env.example` (and `frontend/.env.example`):
 
 ```bash
 cd backend
-python -m pytest -q               # 12 tests: API, drafts/404s, headers, CORS, admin path, API + admin-login rate limits
-python manage.py check --deploy   # Django's deployment checklist (warns about HTTPS/HSTS in dev)
+uv run pytest                      # 12 tests: API, drafts/404s, headers, CORS, admin path, API + admin-login rate limits
+uv run python manage.py check --deploy   # Django's deployment checklist (warns about HTTPS/HSTS in dev)
 ```
+
+Or, from the repo root: `make test` / `make check` / `make deploy-check`.
 
 ## Deployment notes
 
 1. Set real env vars (`SECRET_KEY`, `DEBUG=False`, `ALLOWED_HOSTS`, `HTTPS=True`, `SECURE_HSTS_SECONDS`, `CORS_ALLOWED_ORIGINS`, optional `DATABASE_URL`) — startup fails fast if `SECRET_KEY` is missing.
 2. Serve Django behind TLS (reverse proxy); set `RATE_LIMIT_TRUST_PROXY=True` only for a trusted proxy that sets `X-Forwarded-For`.
-3. `python manage.py collectstatic --noinput` and run with a production WSGI server (e.g. gunicorn).
-4. Build the frontend (`npm run build`) and serve `dist/` statically, or point `VITE_API_URL` at the API origin.
+3. `make collectstatic` and run with a production WSGI server (e.g. gunicorn).
+4. Build the frontend (`make frontend-build`) and serve `dist/` statically, or point `VITE_API_URL` at the API origin.
 5. Use a shared cache (Redis/memcached) so rate limiting is accurate across workers.
+6. Keep `backend/uv.lock` committed — `make setup` (uv sync) reproduces the exact dependency set.
