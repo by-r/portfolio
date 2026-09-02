@@ -88,10 +88,11 @@ if DATABASE_URL:
         }
     }
 else:
+    SQLITE_PATH = env.path("SQLITE_PATH", default=BASE_DIR / "db.sqlite3")
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
+            "NAME": SQLITE_PATH,
         }
     }
 
@@ -122,6 +123,10 @@ CORS_ALLOW_CREDENTIALS = False
 
 # HTTPS / secure cookies — flip HTTPS=True in production behind TLS.
 HTTPS = env.bool("HTTPS", default=False)
+if HTTPS:
+    # Trust the HTTPS signal from a reverse proxy that you control.
+    # Required to avoid redirect loops when TLS terminates before Django.
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SESSION_COOKIE_SECURE = HTTPS
 CSRF_COOKIE_SECURE = HTTPS
 SECURE_SSL_REDIRECT = HTTPS

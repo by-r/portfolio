@@ -79,6 +79,7 @@ See `backend/.env.example` (and `frontend/.env.example`):
 | `DEBUG` | Debug mode — keep `False` in production | `False` |
 | `ALLOWED_HOSTS` | Comma-separated host allowlist | `localhost,127.0.0.1` |
 | `DATABASE_URL` | `postgres://user:pass@host:port/name`; empty = SQLite | empty |
+| `SQLITE_PATH` | SQLite database file path | `backend/db.sqlite3` |
 | `ADMIN_URL` | Non-default admin path | `staff/` |
 | `HTTPS` | Enables secure cookies, SSL redirect, HSTS (prod) | `False` |
 | `SECURE_HSTS_SECONDS` | HSTS max-age (e.g. `31536000` in prod) | `0` |
@@ -112,6 +113,37 @@ uv run python manage.py check --deploy   # Django's deployment checklist (warns 
 ```
 
 Or, from the repo root: `make test` / `make check` / `make deploy-check`.
+
+## Docker development
+
+```bash
+make docker-dev-up
+make docker-dev-migrate
+make docker-dev-logs
+make docker-dev-down
+```
+
+This runs Django on `http://localhost:8000` and Vite on `http://localhost:5173`
+with source mounts and hot reload.
+
+## Docker production
+
+On the server, create `backend/.env` from `.env.example`, set a real
+`SECRET_KEY`, and use `DEBUG=False`. Then:
+
+```bash
+make docker-prod-up
+make docker-prod-ps
+make docker-prod-logs
+```
+
+Production uses Gunicorn behind Nginx, with persistent SQLite and static-file
+volumes. Subsequent clean-tree updates use `make docker-prod-deploy`; set
+`NGINX_PORT=127.0.0.1:8080` when a host-level TLS proxy owns port 80.
+
+The Docker Nginx container exposes HTTP. Keep `HTTPS=False` until TLS is
+configured in front of it and forwarding `X-Forwarded-Proto: https`, then set
+`HTTPS=True` and `SECURE_HSTS_SECONDS=31536000`.
 
 ## Deployment notes
 
