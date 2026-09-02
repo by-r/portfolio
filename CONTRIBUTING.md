@@ -34,7 +34,7 @@ make frontend-dev                           # Vite    -> http://localhost:5173
 
 ## Before submitting
 
-- `make check` must pass — ruff lint + format-check + pytest (12 tests).
+- `make check` must pass — ruff lint + format-check + pytest (14 tests).
 - `make frontend-typecheck` and `make frontend-build` must pass (TS + production build).
 - Never commit secrets: `.env` is gitignored; only `.env.example` is tracked. New env vars go into `backend/.env.example` and should be documented in `README.md`.
 - Dependency changes: backend → update `backend/pyproject.toml` and commit the regenerated `uv.lock`; frontend → update `frontend/package.json` + `package-lock.json`.

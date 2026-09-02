@@ -1,5 +1,9 @@
+from io import StringIO
+
 import pytest
+from django.contrib.auth import get_user_model
 from django.core.cache import cache
+from django.core.management import CommandError, call_command
 from django.test import Client, override_settings
 from ninja.testing import TestClient
 
@@ -109,3 +113,34 @@ def test_admin_login_throttled(db):
             django_client.post("/staff/login/", {"username": "x", "password": "y"}).status_code
             == 429
         )
+
+
+def test_seed_demo_is_idempotent_and_authenticates(db):
+    output = StringIO()
+    with override_settings(DEBUG=True):
+        call_command("seed_demo", stdout=output)
+        call_command("seed_demo", stdout=output)
+
+    User = get_user_model()
+    assert User.objects.filter(username="admin").count() == 1
+    admin = User.objects.get(username="admin")
+    assert admin.email == "admin@example.test"
+    assert admin.is_superuser
+    credentials = {"username": "admin", "pass" + "word": "admin"}
+    assert Client().login(**credentials)
+
+    assert Post.objects.count() == 2
+    assert Post.objects.filter(is_published=True).count() == 2
+    assert set(Post.objects.values_list("slug", flat=True)) == {
+        "welcome-to-my-portfolio",
+        "building-this-site",
+    }
+    assert "development/demo use only" in output.getvalue()
+
+
+def test_seed_demo_rejects_production(db):
+    with pytest.raises(CommandError, match="only available when DEBUG=True"):
+        call_command("seed_demo")
+
+    assert not get_user_model().objects.filter(username="admin").exists()
+    assert not Post.objects.exists()

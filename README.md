@@ -110,7 +110,7 @@ See `backend/.env.example` (and `frontend/.env.example`):
 
 ```bash
 cd backend
-uv run pytest                      # 12 tests: API, drafts/404s, headers, CORS, admin path, API + admin-login rate limits
+uv run pytest                      # 14 tests: API, security, and idempotent demo seeding
 uv run python manage.py check --deploy   # Django's deployment checklist (warns about HTTPS/HSTS in dev)
 ```
 
@@ -120,13 +120,21 @@ Or, from the repo root: `make test` / `make check` / `make deploy-check`.
 
 ```bash
 make docker-dev
-make docker-dev-migrate
 make docker-dev-logs
 make docker-dev-down
 ```
 
-This runs Django on `http://localhost:8000` and Vite on `http://localhost:5173`
-with source mounts and hot reload.
+Docker development automatically migrates the database and seeds the demo
+account/posts before starting Django. Visit:
+
+- Frontend: `http://localhost:5173`
+- API: `http://localhost:8000/api/health`
+- Admin: `http://localhost:8000/staff/`
+- Login: `admin` / `admin` (**development only**)
+
+Use `make docker-dev-migrate` to apply migrations manually after schema changes.
+Demo seeding runs only in Docker development; production never creates demo
+users or posts.
 
 ## Docker production
 
@@ -140,7 +148,9 @@ make docker-prod-logs
 ```
 
 Production uses Gunicorn behind Nginx, with persistent SQLite and static-file
-volumes. Subsequent clean-tree updates use `make docker-prod-deploy`; set
+volumes. Create a unique superuser with a secure password for production;
+`seed_demo` is never run there. Subsequent clean-tree updates use
+`make docker-prod-deploy`; set
 `NGINX_PORT=8080 make docker-prod` when a host-level TLS proxy owns port 80.
 
 The Docker Nginx container exposes HTTP. Keep `HTTPS=False` until TLS is
@@ -149,7 +159,7 @@ configured in front of it and forwarding `X-Forwarded-Proto: https`, then set
 
 ## Deployment notes
 
-1. Set real env vars (`SECRET_KEY`, `DEBUG=False`, `ALLOWED_HOSTS`, `HTTPS=True`, `SECURE_HSTS_SECONDS`, `CORS_ALLOWED_ORIGINS`, optional `DATABASE_URL`) — startup fails fast if `SECRET_KEY` is missing.
+1. Set real env vars (`SECRET_KEY`, `DEBUG=False`, `ALLOWED_HOSTS`, `CORS_ALLOWED_ORIGINS`, optional `DATABASE_URL`) — startup fails fast if `SECRET_KEY` is missing. Enable `HTTPS=True` and HSTS only after TLS is configured.
 2. Serve Django behind TLS (reverse proxy); set `RATE_LIMIT_TRUST_PROXY=True` only for a trusted proxy that sets `X-Forwarded-For`.
 3. `make collectstatic` and run with a production WSGI server (e.g. gunicorn).
 4. Build the frontend (`make frontend-build`) and serve `dist/` statically, or point `VITE_API_URL` at the API origin.
