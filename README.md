@@ -68,6 +68,8 @@ The root `Makefile` wraps the common commands (backend via `uv`, frontend via `n
 | `make collectstatic` | Collect static files for production |
 | `make frontend-install` / `frontend-dev` / `frontend-build` / `frontend-typecheck` | npm ci / dev server / build / typecheck |
 | `make clean` | Remove `frontend/dist` |
+| `make docker-dev` / `docker-dev-down` / `docker-dev-logs` / `docker-dev-migrate` | Docker development lifecycle |
+| `make docker-prod` / `docker-prod-down` / `docker-prod-logs` / `docker-prod-ps` / `docker-prod-deploy` | Docker production lifecycle |
 
 ## Environment variables
 
@@ -117,7 +119,7 @@ Or, from the repo root: `make test` / `make check` / `make deploy-check`.
 ## Docker development
 
 ```bash
-make docker-dev-up
+make docker-dev
 make docker-dev-migrate
 make docker-dev-logs
 make docker-dev-down
@@ -132,14 +134,14 @@ On the server, create `backend/.env` from `.env.example`, set a real
 `SECRET_KEY`, and use `DEBUG=False`. Then:
 
 ```bash
-make docker-prod-up
+make docker-prod
 make docker-prod-ps
 make docker-prod-logs
 ```
 
 Production uses Gunicorn behind Nginx, with persistent SQLite and static-file
 volumes. Subsequent clean-tree updates use `make docker-prod-deploy`; set
-`NGINX_PORT=127.0.0.1:8080` when a host-level TLS proxy owns port 80.
+`NGINX_PORT=8080 make docker-prod` when a host-level TLS proxy owns port 80.
 
 The Docker Nginx container exposes HTTP. Keep `HTTPS=False` until TLS is
 configured in front of it and forwarding `X-Forwarded-Proto: https`, then set

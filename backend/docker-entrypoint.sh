@@ -2,9 +2,9 @@
 set -eu
 
 echo "Applying database migrations..."
-python manage.py migrate --noinput
+uv run --no-sync python manage.py migrate --noinput
 
 echo "Collecting static files..."
-python manage.py collectstatic --noinput
+uv run --no-sync python manage.py collectstatic --noinput
 
 exec "$@"

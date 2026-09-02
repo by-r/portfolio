@@ -87,69 +87,43 @@ frontend-typecheck: ## Typecheck the frontend only
 clean: ## Remove frontend build output (dist/)
 	rm -rf $(FRONTEND)/dist
 
-# --- Local convenience aliases ---------------------------------------------
-
-.PHONY: local-setup
-local-setup: setup frontend-install ## Install native backend and frontend dependencies
-
-.PHONY: local-migrate
-local-migrate: migrate ## Apply Django migrations using the native environment
-
-.PHONY: local-backend
-local-backend: run ## Run Django locally at http://127.0.0.1:8000
-
-.PHONY: local-frontend
-local-frontend: frontend-dev ## Run Vite locally at http://localhost:5173
-
-.PHONY: local-check
-local-check: check frontend-typecheck ## Run backend checks and frontend typecheck
-
 # --- Docker ----------------------------------------------------------------
 
-COMPOSE           ?= docker compose
-DEV_COMPOSE_FILE  ?= compose.dev.yml
-PROD_COMPOSE_FILE ?= compose.yml
-NGINX_PORT        ?= 80
+COMPOSE ?= docker compose
+DEV_COMPOSE ?= $(COMPOSE) -f compose.dev.yml
+PROD_COMPOSE ?= $(COMPOSE) -f compose.yml
 
-.PHONY: docker-dev-up
-docker-dev-up: ## Build and start Docker development services (Vite :5173, Django :8000)
-	$(COMPOSE) -f $(DEV_COMPOSE_FILE) up --build -d
+.PHONY: docker-dev docker-dev-down docker-dev-logs docker-dev-migrate
+docker-dev: ## Start Docker development (frontend :5173, API :8000)
+	$(DEV_COMPOSE) up --build -d
 
-.PHONY: docker-dev-down
-docker-dev-down: ## Stop Docker development services
-	$(COMPOSE) -f $(DEV_COMPOSE_FILE) down
+docker-dev-down: ## Stop Docker development containers
+	$(DEV_COMPOSE) down
 
-.PHONY: docker-dev-logs
 docker-dev-logs: ## Follow Docker development logs
-	$(COMPOSE) -f $(DEV_COMPOSE_FILE) logs -f
+	$(DEV_COMPOSE) logs -f
 
-.PHONY: docker-dev-migrate
-docker-dev-migrate: ## Apply Django migrations in Docker development services
-	$(COMPOSE) -f $(DEV_COMPOSE_FILE) run --rm web python manage.py migrate
+docker-dev-migrate: ## Run Django migrations in Docker development
+	$(DEV_COMPOSE) run --rm web uv run --no-sync python manage.py migrate
 
-.PHONY: docker-prod-up
-docker-prod-up: ## Build and start production containers (requires backend/.env)
-	NGINX_PORT=$(NGINX_PORT) $(COMPOSE) -f $(PROD_COMPOSE_FILE) up --build -d
+.PHONY: docker-prod docker-prod-down docker-prod-logs docker-prod-ps docker-prod-deploy
+docker-prod: ## Build and start production containers (requires backend/.env)
+	$(PROD_COMPOSE) up --build -d
 
-.PHONY: docker-prod-down
-docker-prod-down: ## Stop production containers; preserves SQLite and static volumes
-	$(COMPOSE) -f $(PROD_COMPOSE_FILE) down
+docker-prod-down: ## Stop production containers; keep volumes
+	$(PROD_COMPOSE) down
 
-.PHONY: docker-prod-logs
 docker-prod-logs: ## Follow production container logs
-	$(COMPOSE) -f $(PROD_COMPOSE_FILE) logs -f
+	$(PROD_COMPOSE) logs -f
 
-.PHONY: docker-prod-ps
 docker-prod-ps: ## Show production container status
-	$(COMPOSE) -f $(PROD_COMPOSE_FILE) ps
+	$(PROD_COMPOSE) ps
 
-.PHONY: docker-prod-deploy
-docker-prod-deploy: ## Pull a clean working tree, rebuild, and restart production
+docker-prod-deploy: ## Pull a clean checkout, rebuild, and restart production
 	@set -eu; \
 	if [ -n "$$(git status --porcelain)" ]; then \
 		echo "Refusing deploy: working tree is not clean."; \
-		echo "Commit, stash, or discard local changes first."; \
 		exit 1; \
 	fi; \
 	git pull --ff-only; \
-	NGINX_PORT=$(NGINX_PORT) $(COMPOSE) -f $(PROD_COMPOSE_FILE) up --build -d
+	$(PROD_COMPOSE) up --build -d
