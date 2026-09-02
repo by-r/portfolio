@@ -110,7 +110,7 @@ See `backend/.env.example` (and `frontend/.env.example`):
 
 ```bash
 cd backend
-uv run pytest                      # 14 tests: API, security, and idempotent demo seeding
+uv run pytest                      # 16 tests: API, security, and idempotent demo seeding
 uv run python manage.py check --deploy   # Django's deployment checklist (warns about HTTPS/HSTS in dev)
 ```
 

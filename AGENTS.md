@@ -15,7 +15,7 @@ Run from the repo root. Python deps are managed with uv (`backend/pyproject.toml
 - `make docker-dev` — migrate, seed demo data, and start Docker development services
 - `make docker-prod` — build and start production services (requires `backend/.env`)
 - `make run` — Django dev server → http://127.0.0.1:8000 (admin at `/{ADMIN_URL}` = `/staff/`)
-- `make test` — `uv run pytest` (suite in `backend/portfolio/tests.py`, 14 tests)
+- `make test` — `uv run pytest` (suite in `backend/portfolio/tests.py`, 16 tests)
 - `make lint` / `make format` — `uv run ruff check .` / `uv run ruff format .`
 - `make check` — lint + format-check + tests (CI-style gate)
 - `make deploy-check` — `uv run python manage.py check --deploy`
