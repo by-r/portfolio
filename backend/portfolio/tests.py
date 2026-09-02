@@ -119,6 +119,9 @@ def test_seed_demo_is_idempotent_and_authenticates(db):
     output = StringIO()
     with override_settings(DEBUG=True):
         call_command("seed_demo", stdout=output)
+        Post.objects.filter(slug="welcome-to-my-portfolio").update(
+            content="stale content", is_published=False
+        )
         call_command("seed_demo", stdout=output)
 
     User = get_user_model()
@@ -131,6 +134,9 @@ def test_seed_demo_is_idempotent_and_authenticates(db):
 
     assert Post.objects.count() == 2
     assert Post.objects.filter(is_published=True).count() == 2
+    welcome = Post.objects.get(slug="welcome-to-my-portfolio")
+    assert welcome.is_published
+    assert welcome.content != "stale content"
     assert set(Post.objects.values_list("slug", flat=True)) == {
         "welcome-to-my-portfolio",
         "building-this-site",
