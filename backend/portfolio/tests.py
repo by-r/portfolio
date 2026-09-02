@@ -80,6 +80,23 @@ def test_security_headers_present():
     assert resp.headers["Referrer-Policy"] == "same-origin"
 
 
+def test_api_allows_docker_web_host(settings):
+    settings.ALLOWED_HOSTS = ["localhost", "127.0.0.1", "web"]
+
+    response = django_client.get("/api/health", HTTP_HOST="web:8000")
+
+    assert response.status_code == 200
+    assert response.json() == {"status": "ok"}
+
+
+def test_api_rejects_untrusted_host(settings):
+    settings.ALLOWED_HOSTS = ["localhost", "127.0.0.1", "web"]
+
+    response = django_client.get("/api/health", HTTP_HOST="untrusted.example")
+
+    assert response.status_code == 400
+
+
 def test_cors_allows_frontend_origin():
     resp = django_client.get("/api/health", HTTP_ORIGIN="http://localhost:5173")
     assert resp.headers.get("Access-Control-Allow-Origin") == "http://localhost:5173"

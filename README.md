@@ -132,6 +132,11 @@ account/posts before starting Django. Visit:
 - Admin: `http://localhost:8000/staff/`
 - Login: `admin` / `admin` (**development only**)
 
+Docker development permits the internal Compose hostname `web` in
+`ALLOWED_HOSTS` so Vite can proxy `/api` requests to Django. Production must
+list only the real public domain names (and a temporary server IP only when
+needed for pre-DNS testing).
+
 Use `make docker-dev-migrate` to apply migrations manually after schema changes.
 Demo seeding runs only in Docker development; production never creates demo
 users or posts.
