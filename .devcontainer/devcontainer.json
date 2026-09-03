@@ -1,0 +1,72 @@
+{
+  "name": "Portfolio",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/node:2": {
+      "version": "20"
+    }
+  },
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/${localWorkspaceFolderBasename},type=bind,consistency=cached",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "mounts": [
+    "source=${devcontainerId}-backend-venv,target=${containerWorkspaceFolder}/backend/.venv,type=volume",
+    "source=${devcontainerId}-frontend-node-modules,target=${containerWorkspaceFolder}/frontend/node_modules,type=volume",
+    "source=${devcontainerId}-backend-data,target=${containerWorkspaceFolder}/backend/.data,type=volume"
+  ],
+  "containerEnv": {
+    "DEBUG": "True",
+    "ALLOWED_HOSTS": "localhost,127.0.0.1",
+    "SQLITE_PATH": "${containerWorkspaceFolder}/backend/.data/db.sqlite3",
+    "DJANGO_BIND": "0.0.0.0:8000",
+    "UV_LINK_MODE": "copy",
+    "HTTPS": "False",
+    "CORS_ALLOWED_ORIGINS": "http://localhost:5173",
+    "RATE_LIMIT_TRUST_PROXY": "False"
+  },
+  "init": true,
+  "forwardPorts": [8000, 5173],
+  "portsAttributes": {
+    "8000": {
+      "label": "Django API and admin",
+      "onAutoForward": "notify"
+    },
+    "5173": {
+      "label": "Vite frontend",
+      "onAutoForward": "openBrowser"
+    }
+  },
+  "postCreateCommand": "sudo chown -R vscode:vscode backend/.venv frontend/node_modules backend/.data && uv sync --directory backend --frozen && npm ci --prefix frontend",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "charliermarsh.ruff",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
+        "ms-azuretools.vscode-docker"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "${workspaceFolder}/backend/.venv/bin/python",
+        "python.analysis.extraPaths": [
+          "${workspaceFolder}/backend"
+        ],
+        "[python]": {
+          "editor.defaultFormatter": "charliermarsh.ruff",
+          "editor.codeActionsOnSave": {
+            "source.fixAll": "explicit",
+            "source.organizeImports": "explicit"
+          }
+        },
+        "[javascript][javascriptreact][typescript][typescriptreact]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        }
+      }
+    }
+  },
+  "updateRemoteUserUID": true,
+  "remoteUser": "vscode"
+}

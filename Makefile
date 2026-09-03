@@ -8,6 +8,7 @@
 BACKEND  := backend
 FRONTEND := frontend
 UV       := uv
+DJANGO_BIND ?= 127.0.0.1:8000
 
 .DEFAULT_GOAL := help
 
@@ -37,7 +38,7 @@ superuser: ## Create a Django admin superuser
 
 .PHONY: run
 run: ## Run the Django dev server on http://127.0.0.1:8000
-	cd $(BACKEND) && $(UV) run python manage.py runserver 127.0.0.1:8000
+	cd $(BACKEND) && $(UV) run python manage.py runserver $(DJANGO_BIND)
 
 .PHONY: test
 test: ## Run the backend test suite (pytest)

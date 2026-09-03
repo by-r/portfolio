@@ -18,8 +18,35 @@ frontend/  Vite React SPA — Node 18+
 - Python 3.10+
 - [uv](https://docs.astral.sh/uv/) (`pip install uv`) — Python package manager
 - Node 18+ (tested with 18.18)
+- (optional) [Docker](https://docs.docker.com/get-docker/) and the [Dev Containers](https://code.visualstudio.com/docs/devcontainers/containers) extension for the containerized development environment
 - (optional) PostgreSQL for production
 - (optional) GNU make — used by the root `Makefile` (see below); on Windows install via `choco install make` / `winget install` or just run the recipes directly
+
+## Dev Container
+
+The repository includes a reproducible development container with Python 3.10,
+uv, and Node.js 20. It runs as the non-root `vscode` user and keeps the backend
+virtual environment and frontend `node_modules` in named container volumes, so
+platform-specific dependencies do not enter the checkout.
+
+In VS Code, install the Dev Containers extension, open the repository, and run
+`Dev Containers: Reopen in Container` from the Command Palette. Dependencies are
+installed automatically after the container is created. Then use two terminals:
+
+```bash
+make run              # Django -> http://127.0.0.1:8000
+make frontend-dev     # Vite   -> http://localhost:5173
+```
+
+Inside the container, `DJANGO_BIND=0.0.0.0:8000` is set automatically so the
+forwarded Django port is reachable. The same variable can be overridden when
+running the Makefile directly on a host.
+
+The forwarded ports provide the frontend, API, and Django admin at `/staff/`.
+The container sets development-only environment defaults and does not create or
+require a `backend/.env` file; its SQLite database is stored in a named
+container volume. Use Docker Compose instead when you want the frontend and
+backend to run as separate services (`make docker-dev`).
 
 ## Backend setup (uv)
 
