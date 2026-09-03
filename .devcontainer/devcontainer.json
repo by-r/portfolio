@@ -37,7 +37,7 @@
       "onAutoForward": "openBrowser"
     }
   },
-  "postCreateCommand": "sudo chown -R vscode:vscode backend/.venv frontend/node_modules backend/.data && uv sync --directory backend --frozen && npm ci --prefix frontend",
+  "postCreateCommand": "mkdir -p backend/.venv frontend/node_modules backend/.data && sudo chown -R vscode:vscode backend/.venv frontend/node_modules backend/.data && uv sync --directory backend --frozen && npm ci --prefix frontend",
   "customizations": {
     "vscode": {
       "extensions": [
