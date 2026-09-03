@@ -10,14 +10,30 @@ export interface PostDetail extends PostSummary {
   content: string;
 }
 
-const API_BASE: string = import.meta.env.VITE_API_URL || "/api";
+const API_BASE = import.meta.env.VITE_API_URL || "/api";
 
 async function get<T>(path: string): Promise<T> {
-  const res = await fetch(`${API_BASE}${path}`);
-  if (!res.ok) {
-    throw new Error(`API request failed: ${res.status} ${res.statusText}`);
+  const url = `${API_BASE}${path}`;
+
+  try {
+    const res = await fetch(url);
+
+    if (!res.ok) {
+      const body = await res.text();
+      const detail = body ? ` — ${body.slice(0, 300)}` : "";
+      throw new Error(`API request failed (${res.status} ${res.statusText}) at ${url}${detail}`);
+    }
+
+    return (await res.json()) as T;
+  } catch (error) {
+    if (error instanceof TypeError) {
+      throw new Error(
+        `API request could not reach ${url}. Check that Django is running and the API URL/proxy is configured.`,
+      );
+    }
+
+    throw error;
   }
-  return (await res.json()) as T;
 }
 
 export const api = {

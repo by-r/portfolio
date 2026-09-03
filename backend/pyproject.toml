@@ -10,6 +10,7 @@ dependencies = [
     "django-cors-headers==4.9.0",
     "django-csp==4.0",
     "psycopg[binary]==3.3.4",
+    "gunicorn>=26.2.0",
 ]
 
 [dependency-groups]

@@ -12,8 +12,10 @@ Run from the repo root. Python deps are managed with uv (`backend/pyproject.toml
 
 - `make setup` — `uv sync`: create/refresh `backend/.venv` and install deps
 - `make migrate` / `make seed` / `make superuser` — Django migrate / seed sample posts / create admin user
+- `make docker-dev` — migrate, seed demo data, and start Docker development services
+- `make docker-prod` — build and start production services (requires `backend/.env`)
 - `make run` — Django dev server → http://127.0.0.1:8000 (admin at `/{ADMIN_URL}` = `/staff/`)
-- `make test` — `uv run pytest` (suite in `backend/portfolio/tests.py`, 12 tests)
+- `make test` — `uv run pytest` (suite in `backend/portfolio/tests.py`, 16 tests)
 - `make lint` / `make format` — `uv run ruff check .` / `uv run ruff format .`
 - `make check` — lint + format-check + tests (CI-style gate)
 - `make deploy-check` — `uv run python manage.py check --deploy`
@@ -34,6 +36,7 @@ with `DEBUG=True` already exists). Django fails fast when `DEBUG=False` and
   - `admin.py` + `widgets.py` — admin with a live XSS-safe Markdown preview widget (`static/portfolio/admin/…`)
   - `middleware.py` — per-IP rate limiting (API + admin login)
   - `management/commands/seed_posts.py` — idempotent sample posts
+  - `management/commands/seed_demo.py` — DEBUG-only Docker development user/posts
   - `tests.py` — pytest suite (API behavior + security: headers, CORS, admin path, rate limits)
 - `frontend/src/` — `main.tsx` entry → `App.tsx` (BrowserRouter + Kumo `LinkProvider` adapter), `pages/` (Home, Blog, BlogPost), `components/Layout.tsx`, `lib/api.ts` (typed fetch client, `VITE_API_URL` fallback `/api`), `index.css` (Kumo styles imported before Tailwind).
 

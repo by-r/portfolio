@@ -86,3 +86,44 @@ frontend-typecheck: ## Typecheck the frontend only
 .PHONY: clean
 clean: ## Remove frontend build output (dist/)
 	rm -rf $(FRONTEND)/dist
+
+# --- Docker ----------------------------------------------------------------
+
+COMPOSE ?= docker compose
+DEV_COMPOSE ?= $(COMPOSE) -f compose.dev.yml
+PROD_COMPOSE ?= $(COMPOSE) -f compose.yml
+
+.PHONY: docker-dev docker-dev-down docker-dev-logs docker-dev-migrate
+docker-dev: ## Start Docker development (frontend :5173, API :8000)
+	$(DEV_COMPOSE) up --build -d
+
+docker-dev-down: ## Stop Docker development containers
+	$(DEV_COMPOSE) down
+
+docker-dev-logs: ## Follow Docker development logs
+	$(DEV_COMPOSE) logs -f
+
+docker-dev-migrate: ## Run Django migrations in Docker development
+	$(DEV_COMPOSE) run --rm web uv run --no-sync python manage.py migrate
+
+.PHONY: docker-prod docker-prod-down docker-prod-logs docker-prod-ps docker-prod-deploy
+docker-prod: ## Build and start production containers (requires backend/.env)
+	$(PROD_COMPOSE) up --build -d
+
+docker-prod-down: ## Stop production containers; keep volumes
+	$(PROD_COMPOSE) down
+
+docker-prod-logs: ## Follow production container logs
+	$(PROD_COMPOSE) logs -f
+
+docker-prod-ps: ## Show production container status
+	$(PROD_COMPOSE) ps
+
+docker-prod-deploy: ## Pull a clean checkout, rebuild, and restart production
+	@set -eu; \
+	if [ -n "$$(git status --porcelain)" ]; then \
+		echo "Refusing deploy: working tree is not clean."; \
+		exit 1; \
+	fi; \
+	git pull --ff-only; \
+	$(PROD_COMPOSE) up --build -d

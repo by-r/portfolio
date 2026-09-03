@@ -1,5 +1,9 @@
+from io import StringIO
+
 import pytest
+from django.contrib.auth import get_user_model
 from django.core.cache import cache
+from django.core.management import CommandError, call_command
 from django.test import Client, override_settings
 from ninja.testing import TestClient
 
@@ -76,6 +80,23 @@ def test_security_headers_present():
     assert resp.headers["Referrer-Policy"] == "same-origin"
 
 
+def test_api_allows_docker_web_host(settings):
+    settings.ALLOWED_HOSTS = ["localhost", "127.0.0.1", "web"]
+
+    response = django_client.get("/api/health", HTTP_HOST="web:8000")
+
+    assert response.status_code == 200
+    assert response.json() == {"status": "ok"}
+
+
+def test_api_rejects_untrusted_host(settings):
+    settings.ALLOWED_HOSTS = ["localhost", "127.0.0.1", "web"]
+
+    response = django_client.get("/api/health", HTTP_HOST="untrusted.example")
+
+    assert response.status_code == 400
+
+
 def test_cors_allows_frontend_origin():
     resp = django_client.get("/api/health", HTTP_ORIGIN="http://localhost:5173")
     assert resp.headers.get("Access-Control-Allow-Origin") == "http://localhost:5173"
@@ -109,3 +130,40 @@ def test_admin_login_throttled(db):
             django_client.post("/staff/login/", {"username": "x", "password": "y"}).status_code
             == 429
         )
+
+
+def test_seed_demo_is_idempotent_and_authenticates(db):
+    output = StringIO()
+    with override_settings(DEBUG=True):
+        call_command("seed_demo", stdout=output)
+        Post.objects.filter(slug="welcome-to-my-portfolio").update(
+            content="stale content", is_published=False
+        )
+        call_command("seed_demo", stdout=output)
+
+    User = get_user_model()
+    assert User.objects.filter(username="admin").count() == 1
+    admin = User.objects.get(username="admin")
+    assert admin.email == "admin@example.test"
+    assert admin.is_superuser
+    credentials = {"username": "admin", "pass" + "word": "admin"}
+    assert Client().login(**credentials)
+
+    assert Post.objects.count() == 2
+    assert Post.objects.filter(is_published=True).count() == 2
+    welcome = Post.objects.get(slug="welcome-to-my-portfolio")
+    assert welcome.is_published
+    assert welcome.content != "stale content"
+    assert set(Post.objects.values_list("slug", flat=True)) == {
+        "welcome-to-my-portfolio",
+        "building-this-site",
+    }
+    assert "development/demo use only" in output.getvalue()
+
+
+def test_seed_demo_rejects_production(db):
+    with pytest.raises(CommandError, match="only available when DEBUG=True"):
+        call_command("seed_demo")
+
+    assert not get_user_model().objects.filter(username="admin").exists()
+    assert not Post.objects.exists()

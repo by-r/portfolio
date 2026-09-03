@@ -68,6 +68,8 @@ The root `Makefile` wraps the common commands (backend via `uv`, frontend via `n
 | `make collectstatic` | Collect static files for production |
 | `make frontend-install` / `frontend-dev` / `frontend-build` / `frontend-typecheck` | npm ci / dev server / build / typecheck |
 | `make clean` | Remove `frontend/dist` |
+| `make docker-dev` / `docker-dev-down` / `docker-dev-logs` / `docker-dev-migrate` | Docker development lifecycle |
+| `make docker-prod` / `docker-prod-down` / `docker-prod-logs` / `docker-prod-ps` / `docker-prod-deploy` | Docker production lifecycle |
 
 ## Environment variables
 
@@ -79,6 +81,7 @@ See `backend/.env.example` (and `frontend/.env.example`):
 | `DEBUG` | Debug mode — keep `False` in production | `False` |
 | `ALLOWED_HOSTS` | Comma-separated host allowlist | `localhost,127.0.0.1` |
 | `DATABASE_URL` | `postgres://user:pass@host:port/name`; empty = SQLite | empty |
+| `SQLITE_PATH` | SQLite database file path | `backend/db.sqlite3` |
 | `ADMIN_URL` | Non-default admin path | `staff/` |
 | `HTTPS` | Enables secure cookies, SSL redirect, HSTS (prod) | `False` |
 | `SECURE_HSTS_SECONDS` | HSTS max-age (e.g. `31536000` in prod) | `0` |
@@ -107,15 +110,61 @@ See `backend/.env.example` (and `frontend/.env.example`):
 
 ```bash
 cd backend
-uv run pytest                      # 12 tests: API, drafts/404s, headers, CORS, admin path, API + admin-login rate limits
+uv run pytest                      # 16 tests: API, security, and idempotent demo seeding
 uv run python manage.py check --deploy   # Django's deployment checklist (warns about HTTPS/HSTS in dev)
 ```
 
 Or, from the repo root: `make test` / `make check` / `make deploy-check`.
 
+## Docker development
+
+```bash
+make docker-dev
+make docker-dev-logs
+make docker-dev-down
+```
+
+Docker development automatically migrates the database and seeds the demo
+account/posts before starting Django. Visit:
+
+- Frontend: `http://localhost:5173`
+- API: `http://localhost:8000/api/health`
+- Admin: `http://localhost:8000/staff/`
+- Login: `admin` / `admin` (**development only**)
+
+Docker development permits the internal Compose hostname `web` in
+`ALLOWED_HOSTS` so Vite can proxy `/api` requests to Django. Production must
+list only the real public domain names (and a temporary server IP only when
+needed for pre-DNS testing).
+
+Use `make docker-dev-migrate` to apply migrations manually after schema changes.
+Demo seeding runs only in Docker development; production never creates demo
+users or posts.
+
+## Docker production
+
+On the server, create `backend/.env` from `.env.example`, set a real
+`SECRET_KEY`, and use `DEBUG=False`. Then:
+
+```bash
+make docker-prod
+make docker-prod-ps
+make docker-prod-logs
+```
+
+Production uses Gunicorn behind Nginx, with persistent SQLite and static-file
+volumes. Create a unique superuser with a secure password for production;
+`seed_demo` is never run there. Subsequent clean-tree updates use
+`make docker-prod-deploy`; set
+`NGINX_PORT=8080 make docker-prod` when a host-level TLS proxy owns port 80.
+
+The Docker Nginx container exposes HTTP. Keep `HTTPS=False` until TLS is
+configured in front of it and forwarding `X-Forwarded-Proto: https`, then set
+`HTTPS=True` and `SECURE_HSTS_SECONDS=31536000`.
+
 ## Deployment notes
 
-1. Set real env vars (`SECRET_KEY`, `DEBUG=False`, `ALLOWED_HOSTS`, `HTTPS=True`, `SECURE_HSTS_SECONDS`, `CORS_ALLOWED_ORIGINS`, optional `DATABASE_URL`) — startup fails fast if `SECRET_KEY` is missing.
+1. Set real env vars (`SECRET_KEY`, `DEBUG=False`, `ALLOWED_HOSTS`, `CORS_ALLOWED_ORIGINS`, optional `DATABASE_URL`) — startup fails fast if `SECRET_KEY` is missing. Enable `HTTPS=True` and HSTS only after TLS is configured.
 2. Serve Django behind TLS (reverse proxy); set `RATE_LIMIT_TRUST_PROXY=True` only for a trusted proxy that sets `X-Forwarded-For`.
 3. `make collectstatic` and run with a production WSGI server (e.g. gunicorn).
 4. Build the frontend (`make frontend-build`) and serve `dist/` statically, or point `VITE_API_URL` at the API origin.

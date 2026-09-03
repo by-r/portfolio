@@ -1,0 +1,45 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+      target: production
+    env_file:
+      - ./backend/.env
+    environment:
+      # A named volume cannot be mounted directly as a single SQLite file.
+      # This makes the actual SQLite database persist in the sqlite_data volume.
+      SQLITE_PATH: /data/db.sqlite3
+    volumes:
+      - sqlite_data:/data
+      - static_data:/app/staticfiles
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "from urllib.request import urlopen; urlopen('http://127.0.0.1:8000/api/health', timeout=5)",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+    depends_on:
+      web:
+        condition: service_healthy
+    ports:
+      - "${NGINX_PORT:-80}:80"
+    volumes:
+      - static_data:/static:ro
+    restart: unless-stopped
+
+volumes:
+  sqlite_data:
+  static_data:
